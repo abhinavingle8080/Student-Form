@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import emailjs from "emailjs-com";
+import '../Style/StudentF.css';
 
 export default function StudentForm() {
 
@@ -73,14 +74,14 @@ export default function StudentForm() {
                         name="name"
                         value={data.name}
                         onChange={handleChange}
-                    />
+                    /><br/><br/>
                     <input
                         type="email"
                         placeholder="Student Email"
                         name="email"
                         value={data.email}
                         onChange={handleChange}
-                    />
+                    /><br/><br/>
                     <button type="submit" onClick={sendEmail}>Submit</button>
                 </form>
             </div>

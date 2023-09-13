@@ -1,0 +1,22 @@
+div{
+    width: 50%;
+    background-color: aquamarine;
+    margin:30px auto;
+    align-content: center;
+    padding: 30px;
+    border-radius: 20px;
+}
+input{
+    width: 400px;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+button{
+    width: 150px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: darkgoldenrod;
+    color: white;
+    font-weight: bold;
+}
