@@ -73,9 +73,48 @@ export default function StudentForm() {
     };
 
 
-    function applyCoupon() {
+    async function applyCoupon() {
 
+        console.log("apply coupon in progress");
+
+        try {
+            // Fetch the list of valid coupons
+            const response = await fetch('https://sheetdb.io/api/v1/wczhv5i1nbin5', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                console.error('Failed to fetch coupons');
+                return;
+            }
+
+            const couponData = await response.json();
+            const validCoupons = couponData.map((coupon) => coupon.code);
+
+            // Check if the entered coupon is valid
+            if (validCoupons.includes(data.coupon)) {
+                // Apply a discount based on the coupon code
+                if (data.coupon === couponData.code) {
+                    data.paidFees -= couponData.amount; // 30% discount
+                } else if (data.coupon === couponData.code) {
+                    data.paidFees -= couponData.amount; // 20% discount
+                } else if (data.coupon === couponData.code) {
+                    data.paidFees -= couponData.amount; // 10% discount
+                }
+
+                // Update the UI or show a message indicating the discount was applied
+            } else {
+                // Handle the case where the coupon is not valid
+                // You can display an error message or take other actions
+            }
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+        }
     }
+
 
     return (
         <>
@@ -242,6 +281,7 @@ export default function StudentForm() {
                                     name="coupon"
                                     value={data.coupon}
                                     onChange={handleChange}
+                                    onInput={applyCoupon}
                                     className="form-control"
                                 />
                             </div>
