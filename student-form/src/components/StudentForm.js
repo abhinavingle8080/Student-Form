@@ -3,7 +3,10 @@ import emailjs from '@emailjs/browser';
 import '../styles/StudentForm.css';
 import logo from '../img/logo.png';
 
+
 export default function StudentForm() {
+
+    const [showCoupon, setShowCoupon] = useState(false);
 
     const [data, setData] = useState({
         firstName: '',
@@ -11,11 +14,14 @@ export default function StudentForm() {
         email: '',
         age: '',
         dob: '',
-        gender:'',
+        gender: '',
         contact: '',
         parentContact: '',
         education: '',
-        itLevel: ''
+        itLevel: '',
+        fees: '',
+        paidFees: '',
+        coupon: ''
     });
 
     const handleChange = (event) => {
@@ -66,11 +72,16 @@ export default function StudentForm() {
             });
     };
 
+
+    function applyCoupon() {
+
+    }
+
     return (
         <>
             <div className="container mt-5">
                 <div className="student-form">
-                    <img className={"logo"} src={logo} />
+                    <img className={"logo"} src={logo}/>
                     <h2 className="form-heading">Registration Form</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
@@ -203,6 +214,38 @@ export default function StudentForm() {
                                 <option value="Advanced">Experienced</option>
                             </select>
                         </div>
+                        <div className="form-group">
+                            <label htmlFor="paidFees">Paid Fees:</label>
+                            <input
+                                type="number"
+                                id="paidFees"
+                                name="paidFees"
+                                value={data.paidFees}
+                                onChange={handleChange}
+                                className="form-control"
+                                required
+                            />
+                        </div>
+                        <button
+                            className="coupon-btn"
+                            type="button"
+                            onClick={() => setShowCoupon(!showCoupon)}
+                        >
+                            {showCoupon ? 'Hide Coupon' : 'Apply Coupon -->'}
+                        </button>
+                        {showCoupon && (
+                            <div className="form-group">
+                                <label htmlFor="coupon">Coupon:</label>
+                                <input
+                                    type="text"
+                                    id="coupon"
+                                    name="coupon"
+                                    value={data.coupon}
+                                    onChange={handleChange}
+                                    className="form-control"
+                                />
+                            </div>
+                        )}
                         <button className="btn btn-primary submit-btn" type="submit">Submit</button>
                     </form>
                 </div>
