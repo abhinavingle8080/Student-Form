@@ -1,12 +1,15 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import emailjs from '@emailjs/browser';
 import '../styles/StudentForm.css';
-import logo from '../img/logo.png';
+import logo from '../img/Full-Logo.png';
+import {QrReader} from "react-qr-reader";
+import axios from "axios";
 
 
 export default function StudentForm() {
 
     const [showCoupon, setShowCoupon] = useState(false);
+    const [validCoupons, setValidCoupons] = useState([]);
 
     const [data, setData] = useState({
         firstName: '',
@@ -19,10 +22,12 @@ export default function StudentForm() {
         parentContact: '',
         education: '',
         itLevel: '',
-        fees: '',
-        paidFees: '',
-        coupon: ''
+        course:'',
+        fees: 0,
+        paidFees: 0,
+        couponCode: '',
     });
+
 
     const handleChange = (event) => {
         const {name, value} = event.target;
@@ -73,48 +78,41 @@ export default function StudentForm() {
     };
 
 
-    async function applyCoupon() {
-
-        console.log("apply coupon in progress");
-
+    const fetchCoupons = async () => {
         try {
-            // Fetch the list of valid coupons
-            const response = await fetch('https://sheetdb.io/api/v1/wczhv5i1nbin5', {
-                method: 'GET',
+            const responce = await axios.get('https://sheetdb.io/api/v1/ivyccp59wbjb2', {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
-            if (!response.ok) {
-                console.error('Failed to fetch coupons');
-                return;
-            }
-
-            const couponData = await response.json();
-            const validCoupons = couponData.map((coupon) => coupon.code);
-
-            // Check if the entered coupon is valid
-            if (validCoupons.includes(data.coupon)) {
-                // Apply a discount based on the coupon code
-                if (data.coupon === couponData.code) {
-                    data.paidFees -= couponData.amount; // 30% discount
-                } else if (data.coupon === couponData.code) {
-                    data.paidFees -= couponData.amount; // 20% discount
-                } else if (data.coupon === couponData.code) {
-                    data.paidFees -= couponData.amount; // 10% discount
+            if (responce.status === 200) {
+                const couponData = responce.data;
+                if (Array.isArray(couponData)) {
+                    setValidCoupons(couponData);
                 }
-
-                // Update the UI or show a message indicating the discount was applied
-            } else {
-                // Handle the case where the coupon is not valid
-                // You can display an error message or take other actions
             }
-        } catch (error) {
-            console.error('Error applying coupon:', error);
+        } catch (e) {
+            console.log('fetching coupons failed');
         }
     }
 
+
+    const applyCoupon = () => {
+        fetchCoupons();
+
+        try {
+            for (let i = 0; i < validCoupons.length; i++) {
+                if (validCoupons[i].code === data.couponCode) {
+                    console.log('coupon is valid');
+                    data.paidFees -= validCoupons[i].amount;
+                    setShowCoupon(false);
+                }
+            }
+        } catch (e) {
+            console.log('applying Coupon failed');
+        }
+    }
 
     return (
         <>
@@ -129,7 +127,7 @@ export default function StudentForm() {
                                 type="text"
                                 id="firstName"
                                 name="firstName"
-                                value={data.firstName}
+                                value={data.firstName || ''}  //character limit
                                 onChange={handleChange}
                                 className="form-control"
                                 required
@@ -181,12 +179,12 @@ export default function StudentForm() {
                                 value={data.dob}
                                 onChange={handleChange}
                                 className="form-control"
-                                placeholder="YYYY-MM-DD"
+                                // placeholder="YYYY-MM-DD"
                                 required
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="itLevel">Gender:</label>
+                            <label htmlFor="gender">Gender:</label>
                             <select
                                 id="gender"
                                 name="gender"
@@ -194,9 +192,9 @@ export default function StudentForm() {
                                 onChange={handleChange}
                                 className="form-control"
                             >
-                                <option value="Beginner">Male</option>
-                                <option value="Intermediate">Female</option>
-                                <option value="Advanced">Others</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Others">Others</option>
                             </select>
                         </div>
                         <div className="form-group">
@@ -253,6 +251,22 @@ export default function StudentForm() {
                                 <option value="Advanced">Experienced</option>
                             </select>
                         </div>
+
+                        <div className="form-group">
+                            <label htmlFor="course">Course: </label>
+                            <select
+                                id="course"
+                                name="course"
+                                value={data.course}
+                                onChange={handleChange}
+                                className="form-control"
+                            >
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+
                         <div className="form-group">
                             <label htmlFor="paidFees">Paid Fees:</label>
                             <input
@@ -270,20 +284,32 @@ export default function StudentForm() {
                             type="button"
                             onClick={() => setShowCoupon(!showCoupon)}
                         >
-                            {showCoupon ? 'Hide Coupon' : 'Apply Coupon -->'}
+                            {showCoupon ? 'Hide Coupon <' : 'Apply Coupon >'}
                         </button>
                         {showCoupon && (
                             <div className="form-group">
-                                <label htmlFor="coupon">Coupon:</label>
+                                <label htmlFor="couponCode">Coupon:</label>
                                 <input
                                     type="text"
-                                    id="coupon"
-                                    name="coupon"
-                                    value={data.coupon}
+                                    id="couponCode"
+                                    name="couponCode"
+                                    value={data.couponCode}
                                     onChange={handleChange}
-                                    onInput={applyCoupon}
                                     className="form-control"
                                 />
+                                <button className="coupon-btn" onClick={applyCoupon}> apply</button>
+                                {/*<QrReader*/}
+                                {/*    onResult={(result, error) => {*/}
+                                {/*        if (!!result) {*/}
+                                {/*            data.coupon = (result?.text);*/}
+                                {/*        }*/}
+
+                                {/*        if (!!error) {*/}
+                                {/*            console.info(error);*/}
+                                {/*        }*/}
+                                {/*    }}*/}
+                                {/*    style={{width: '100%'}}*/}
+                                {/*/>*/}
                             </div>
                         )}
                         <button className="btn btn-primary submit-btn" type="submit">Submit</button>

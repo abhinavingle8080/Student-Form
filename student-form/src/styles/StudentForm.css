@@ -9,10 +9,10 @@
 }
 
 .form-heading{
-    font-size: 48px;
+    font-size: 36px;
     width: 100%;
     border-width: 0;
-    margin-left: 45px;
+    margin-left: 95px;
 }
 .submit-btn{
     height: 45px;
@@ -25,9 +25,8 @@
     display: block;
 }
 .logo{
-    height: 100px;
-    width: 150px;
-    margin-left: 150px;
+    height: 350px;
+
     margin-bottom: 10px;
 }
 
@@ -40,5 +39,9 @@
 .coupon-btn:active{
     border-width: 0;
     border-color: white;
+}
+
+.container{
+    margin-left: 600px;
 }
 
