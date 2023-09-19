@@ -6,7 +6,7 @@ export default function StudentList() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await fetch('https://sheetdb.io/api/v1/yzxopq700oss7', {
+                const response = await fetch('https://sheetdb.io/api/v1/ivyccp59wbjb2?sheet=students', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

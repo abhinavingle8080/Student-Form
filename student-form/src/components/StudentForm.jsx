@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import emailjs from '@emailjs/browser';
 import '../styles/StudentForm.css';
+import '../styles/CoursesDropDown.css';
 import logo from '../img/Full-Logo.png';
 import {QrReader} from "react-qr-reader";
 import axios from "axios";
@@ -10,6 +11,7 @@ export default function StudentForm() {
 
     const [showCoupon, setShowCoupon] = useState(false);
     const [validCoupons, setValidCoupons] = useState([]);
+    const [coursesDB, setCoursesDB] = useState([]);
 
     const [data, setData] = useState({
         firstName: '',
@@ -22,7 +24,7 @@ export default function StudentForm() {
         parentContact: '',
         education: '',
         itLevel: '',
-        course:'',
+        courses: [],
         fees: 0,
         paidFees: 0,
         couponCode: '',
@@ -38,7 +40,7 @@ export default function StudentForm() {
         e.preventDefault();
 
         // Send student data to the server
-        const response = await fetch('https://sheetdb.io/api/v1/yzxopq700oss7', {
+        const response = await fetch('https://sheetdb.io/api/v1/ivyccp59wbjb2?sheet=students', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -80,7 +82,7 @@ export default function StudentForm() {
 
     const fetchCoupons = async () => {
         try {
-            const responce = await axios.get('https://sheetdb.io/api/v1/ivyccp59wbjb2', {
+            const responce = await axios.get('https://sheetdb.io/api/v1/ivyccp59wbjb2?sheet=coupons', {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -111,6 +113,62 @@ export default function StudentForm() {
             }
         } catch (e) {
             console.log('applying Coupon failed');
+        }
+    }
+
+    const handleChangeCourses = (event) => {
+        const {value, checked} = event.target;
+        const updatedCourses = [...data.courses];
+        if (checked) {
+            if (!updatedCourses.includes(value)) {
+                updatedCourses.push(value);
+            }
+        } else {
+            const index = updatedCourses.indexOf(value);
+            if (index !== -1) {
+                updatedCourses.splice(index, 1);
+            }
+        }
+
+        setData({
+            ...data,
+            courses: updatedCourses,
+        });
+    };
+
+    const updateCourseFees = async () => {
+
+
+        try {
+            const responce = await axios.get('https://sheetdb.io/api/v1/ivyccp59wbjb2?sheet=courses', {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if(responce.status === 200){
+                console.log('Courses fetched');
+                const coursesData = responce.data;
+                if (Array.isArray(coursesData)) {
+
+                    // Initialize paidFees
+                    let updatedPaidFees = 0;
+
+                    // Iterate through coursesData and data.courses to update paidFees
+                    for (let i = 0; i < coursesData.length; i++) {
+                        for (let j = 0; j < data.courses.length; j++) {
+                            if (coursesData[i].courseName === data.courses[j]) {
+                                updatedPaidFees += Number(coursesData[i].coursePrice);
+                            }
+                        }
+                    }
+                    data.paidFees = updatedPaidFees;
+                    setCoursesDB(coursesData);
+                }
+            }
+
+
+        } catch(e){
+            console.log('Error fetching courses')
         }
     }
 
@@ -252,19 +310,148 @@ export default function StudentForm() {
                             </select>
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="course">Course: </label>
-                            <select
-                                id="course"
-                                name="course"
-                                value={data.course}
-                                onChange={handleChange}
-                                className="form-control"
-                            >
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Others">Others</option>
-                            </select>
+                        <div>
+                            <details >
+                                <summary>Choose the course you want to enroll</summary>
+                                {/*<ul onInput={updateCourseFees}>*/}
+                                    <ul>
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="Core Java"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes("Core Java")}
+                                            />
+                                            Core Java
+                                        </label>
+                                    </li>
+
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="Core Java + Project in Core Java"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes("Core Java + Project in Core Java")}
+                                            />
+                                            Core Java + Project in Core Java
+                                        </label>
+                                    </li>
+
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="Java Placement Batch"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes("Java Placement Batch")}
+                                            />
+                                            Java Placement Batch
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="Only Project in Java"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes(" Only Project in Java")}
+                                            />
+                                            Only Project in Java
+                                        </label>
+                                    </li>
+
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="C language"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes(" C language")}
+                                            />
+                                            C language
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="C++ language"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes(" C++ language")}
+                                            />
+                                            C++ language
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="Python"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes(" Python")}
+                                            />
+                                            Python
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="Python FullStack"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes(" Python FullStack")}
+                                            />
+                                            Python FullStack
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="DSA"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes(" DSA")}
+                                            />
+                                            DSA
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="fc"
+                                                value="Front-end"
+                                                onChange={handleChangeCourses}
+                                                checked={data.courses.includes(" Front-end")}
+                                            />
+                                            Front-end
+                                        </label>
+                                    </li>
+                                </ul>
+                            </details>
+
+                            <div className="selected-courses-box">
+                                <a>Selected Courses:</a>
+                                <ul>
+                                    {data.courses.map((courses, index) => (
+                                        <li key={index}>{courses}</li>
+                                    ))}
+                                </ul>
+                            </div>
+
+
+                            <button onClick={updateCourseFees}> Confirm</button>
                         </div>
 
                         <div className="form-group">
