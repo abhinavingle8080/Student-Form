@@ -3,6 +3,7 @@ import React from 'react'
 export default function Navbar({onRegisterClick, onStudentListClick}) {
     return (
         <>
+            <div>
             <nav className="navbar navbar-expand-lg bg-body-tertiary">
                 <div className="container-fluid">
                     <a className="navbar-brand" href="#">NCTech Admin</a>
@@ -39,6 +40,7 @@ export default function Navbar({onRegisterClick, onStudentListClick}) {
                     </div>
                 </div>
             </nav>
+            </div>
         </>
     )
 }
